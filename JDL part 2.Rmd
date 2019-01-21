@@ -1,0 +1,359 @@
+---
+output: 
+  html_document:
+    css: CSS files/main.css
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+script_folder <- "Scripts/"
+
+scripts <- c(paste0(script_folder,"variables.R"),
+             paste0(script_folder,"tables.R"),
+             paste0(script_folder,"chevron.R")
+) 
+
+sapply(scripts, source) #Loads all packages, data files and variables
+
+
+```
+<!---------------------------------------------------------------------START OF TEXT------------------------------------------------------------------------------>
+
+<div class="footer">
+This document is released under the Open Government Licence
+</div>
+<-- <div class="footer1">
+This document is released under the Open Government Licence
+</div> --> <!-- Previously required for first page footer in Firefox, but now doesn't seem to be necessary -->
+<body>
+
+<h1><b>`r organisation_name` in their own words</b></h1>
+<br>
+
+<span class="quote">&#8220;</span> <!--- Creates a quote ---->
+`r na.omit(paragraphs$part2_in_their_own_words)` <!----- Organisation's own words ---->
+<span class="quote">&#8221;</span>
+
+<h5> </h5> <!--- Page break---->
+
+
+<h1><b>Response from `r organisation_name` to the Justice Data Lab analysis</b></h1>
+<br>
+
+<span class="quote">&#8220;</span>
+`r na.omit(paragraphs$part2_response)` <!----- Organisation's response ---->
+<span class="quote">&#8221;</span>
+
+
+<h5> </h5> <!--- Page break---->
+
+
+
+<!----------------------------------------------------- Results in Detail----------------------------------------------------->
+
+```{r measures, include=FALSE}
+
+if(num_of_analyses != 1){
+  if(treat_time_numb[1] >=  30){
+    measures_descrip <- "In each analysis, <b>three headline measures</b> of one-year reoffending were analysed, as well as four additional measures 
+(see results in Tables 1-7):
+
+<ol>
+<b><li>Rate of reoffending<br></li></b>
+<b><li>Frequency of reoffending<br></li></b>
+<b><li>Time to first reoffence<br></li></b>
+<li>Rate of first reoffence by court outcome<br></li>
+<li>Frequency of reoffences by court outcome<br></li>
+<li>Rate of custodial sentencing for first reoffence<br></li>
+<li>Frequency of custodial sentencing <br></li>
+
+</ol>"
+    
+  } else {
+    measures_descrip <- "In each analysis, <b>two headline measures</b> of one-year reoffending were analysed 
+(see results in Tables 1-2):
+
+<ol>
+<li>Rate of reoffending<br></li>
+<li>Frequency of reoffending<br></li>
+
+</ol>"
+    
+  }
+} else{
+  
+  if(treat_time_numb[1] >=  30){
+    measures_descrip <- "<b>Three headline measures</b> of one-year reoffending were analysed, as well as four additional measures 
+(see results in Tables 1-7):
+
+<ol>
+<b><li>Rate of reoffending<br></li></b>
+<b><li>Frequency of reoffending<br></li></b>
+<b><li>Time to first reoffence<br></li></b>
+<li>Rate of first reoffence by court outcome<br></li>
+<li>Frequency of reoffences by court outcome<br></li>
+<li>Rate of custodial sentencing for first reoffence<br></li>
+<li>Frequency of custodial sentencing<br></li>
+
+</ol>"
+    
+  } else {
+    measures_descrip <- "<b>Two headline measures</b> of one-year reoffending were analysed 
+(see results in Tables 1-2):
+
+<ol>
+<li>Rate of reoffending<br></li>
+<li>Frequency of reoffending<br></li>
+
+</ol>"
+    
+  }
+}
+
+
+```
+
+<h1><b>Results in detail</b></h1>
+<br>
+
+`r JDLpackage:::format_num(num_of_analyses, word = TRUE, capital = TRUE)` `r JDLpackage:::plural_analysis(num_of_analyses)` `r JDLpackage:::was_were(num_of_analyses)` conducted`r if(num_of_analyses != 1) " in total"`, controlling for offender demographics and criminal history and the following risks and needs: `r oasys_list`.
+
+
+`r analysis_overview_table` <!----- Table overview showing the groups being analysed ---->
+<br>
+
+<!---- Line that states whether headline results are referring to the national analysis---->
+`r if(num_of_analyses != 1) paste("<center><b>The headline results in this report refer to the <u>", analyses_name[headline_analysis], " analysis</u>.</b></center><br>", sep="")` 
+
+The sizes of the treatment and comparison groups for reoffending rate and frequency analyses are provided below.
+
+`r analysis_detail_table` <!--- Table that shows the different group sizes ---->
+<br>
+`r measures_descrip` <!--- Description of the measures being used ---->
+<br>
+``` {r significant results, include = FALSE}
+if(num_of_analyses != 1){
+  if (num_sig == 1){
+    
+    sig_results <- stringr::str_c("<div class = 'sig_results'><h1><center>Significant results</center></h1><br>
+<b>There is one statistically significant result among the analyses.</b> This provides significant evidence that:<br><br>", sig_list)
+    
+  } else if (sig_marker > 0){
+    
+    sig_results <- stringr::str_c("<div class = 'sig_results'><h1><center>Significant results</center></h1><br>
+<b>There are ", JDLpackage:::format_num(num_sig, word = TRUE), " statistically significant results among the analyses.</b> These provide significant evidence that:<br><br>", sig_list)
+    
+    
+  } else {
+    sig_results <- ""
+  }
+} else {
+  if (num_sig == 1){
+    
+    sig_results <- stringr::str_c("<div class = 'sig_results'><h1><center>Significant results</center></h1><br>
+<b>One measure shows a statistically significant result.</b> This provides significant evidence that<br><br>:", sig_list)
+    
+  } else if (sig_marker > 0){
+    
+    sig_results <- stringr::str_c("<div class = 'sig_results'><h1><center>Significant results</center></h1><br>
+<b>", JDLpackage:::format_num(num_sig, word = TRUE, capital = TRUE), " measures show a statistically significant result.</b> These provide significant evidence that:<br><br>", sig_list)
+    
+    
+  } else {
+    sig_results <- ""
+  }
+}
+```
+`r sig_results` <!--- Sentence describing the number of significant results ---->
+
+<h5> </h5> <!--------PAGE BREAK-------->
+
+```{r tables description, include=FALSE}
+
+if(treat_time_numb[1] >=  30){
+  table_descrip <- "Tables 1-7 show the overall measures of reoffending. Rates are expressed as percentages and frequencies expressed per person. Tables 3 to 7 include reoffenders only."
+  
+} else {
+  table_descrip <- "Tables 1-2 show the overall measures of reoffending. Rates are expressed as percentages and frequencies expressed per person."
+  
+}
+
+
+```
+
+`r table_descrip`
+<br>
+<br>
+`r reoff_rate_table` <!----One-year proven reoffending rate table ------->
+<br>
+<br>
+`r reoff_freq_table` <!----One-year proven reoffending frequency table ------->
+
+```{r tables, include=FALSE}
+
+if(treat_time_numb[headline_analysis] >=  30){
+  tables_3_7 <- stringr::str_c("<br><br>",
+                               time_table, #<!----Average time to first reoffence table ------->,
+                               "<h5> </h5> <!--- Page break---->",
+                               
+                               court_rate_table, #<!----One-year proven reoffending rate by court outcome table ------->",
+                               "<br><br>",
+                               
+                               court_freq_table, #<!----One-year proven reoffending frequency by court outcome table ------->",
+                               "<br><br>",
+                               
+                               custody_rate_table, #<!----One-year rate of custodial sentencing ------->",
+                               "<br><br>",
+                               
+                               custody_freq_table #<!----One-year frequency of custodial sentencing ------->"
+                               
+  ) 
+} else{
+  tables_3_7 <- ""
+}
+```
+
+`r tables_3_7`
+
+<h5> </h5> <!--- Page break---->
+<!--------------------------------------------------------PROFILE OF TREATMENT GROUP--------------------------------------------------------------->
+
+
+```{r treatment profile, include=FALSE}
+
+# Adds the box about the participants not included in analysis to the profile of the treatment group
+treat_table %<>% str_c("<div class = 'treatment_profile2'>",
+                       
+                       "<div style = 'text-align: center; font-weight: bold;'>",
+                       "Participants <u>not</u> included in analysis<br>",
+                       "(XX offenders with available data)",
+                       "</div><br>",
+                       "<ul>",
+                       
+                       
+                       "<li>",
+                       "Female XX%, Male XX%",
+                       "</li>",
+                       
+                       "<li>",
+                       "White XX%, Black XX%, Asian XX%, Other XX%, Unknown ethnicity XX%",
+                       "</li>",
+                       
+                       "<li>",
+                       "UK nationality XX%, Foreign nationality XX%, Unknown nationality XX%",
+                       "</li>",
+                       
+                       
+                       "</ul>",
+                       
+                       "<hr>",
+                       "Information on index offences is not available for this group, as they could not be linked to a suitable sentence.",
+                       "<br>",
+                       "<br>",
+                       "For <b>XX people</b> without any records in the reoffending database, no personal information is available.",
+                       "</div>",
+                       "</div>")
+```
+
+
+
+<h1><b>Profile of the treatment group</b> </h1>
+<br>
+
+
+`r na.omit(paragraphs$part2_carried_out)`
+
+<div>
+`r treat_table` <!---Table describing the characteristics of the treatment group---->
+</div>
+
+`r profile_rounding`
+
+<br>
+<!----- Describes how many people have risks and needs (OASys data) ---->
+`r na.omit(paragraphs$part_2_risks_and_needs)`
+
+<div>
+`r some_sig_oasys` <!---- The list of significant OASys variables ----->
+
+</div>
+<h5> </h5> <!--- Page break---->
+
+<!-------------------------------MATCHING THE GROUP------------------------------->
+
+<h1><b>Matching the treatment and comparison groups</b></h1>
+<br>
+
+The `r JDLpackage:::plural_analysis(num_of_analyses)` matched a comparison group to the treatment group. A summary of the matching quality is as follows:
+
+`r oasys_matched` <!---- List describing which analyses were well matched ---->
+
+<br>
+
+Further details of group characteristics and matching quality, including risks and needs recorded by the Offender Assessment System (OASys), can be found in the Excel annex accompanying this report.
+
+This report is also supplemented by a general annex, which answers frequently asked questions about Justice Data Lab analyses and explains the caveats associated with them.
+
+
+
+
+
+
+<p style="margin-top:300px"></p>
+
+<h5> </h5> <!--- Page break---->
+
+<!-----------------------------------------------CHEVRON------------------------------------------------>
+
+<h1 style = "margin-top: -10px;"><b>Numbers of people in the treatment and comparison groups</b></h1>
+<p style="margin-bottom: `r if (nrow(chevron_groups)<=3) 40 else 35`px;"></p>
+
+`r chevron_html`
+
+
+
+<h5> </h5> <!--- Page break---->
+
+<!-----------------------------------------------CONTACT POINTS------------------------------------------------>
+
+<h2><center>Contact Points</center></h2>
+
+<div class = "contacts"> Press enquiries should be directed to the Ministry of Justice press office:
+<br><br>
+Other enquiries about the analysis should be directed to:
+<br><br>
+<b>Annie Sorbie</b><br>
+<b>Justice Data Lab Team</b><br>
+Justice Statistical Analytical Services<br>
+Ministry of Justice<br>
+7th Floor<br>
+102 Petty France<br>
+London<br>
+SW1H 9AJ
+<br><br>
+
+Tel: 07967 592178
+<br><br>
+
+E-mail: <a href="mailto:justice.datalab@justice.gov.uk">justice.datalab@justice.gov.uk</a>
+<br><br>
+
+General enquiries about the statistical work of the Ministry of Justice can be e-mailed to: <a href="mailto:statistics.enquiries@justice.gsi.gov.uk">statistics.enquiries@justice.gsi.gov.uk</a>  <br>
+General information about the official statistics system of the United Kingdom is available from
+<a href="www.statisticsauthority.gov.uk/about-the-authority/uk-statistical-system">www.statisticsauthority.gov.uk/about-the-authority/uk-statistical-system</a>
+<br><br><br>
+
+© Crown copyright `r year`
+<br><br>
+
+Produced by the Ministry of Justice
+<br><br>
+
+Alternative formats are available on request from <a href="mailto:justice.datalab@justice.gov.uk">justice.datalab@justice.gov.uk</a>
+
+
+</div>
+
+</body>
+

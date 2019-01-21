@@ -1,0 +1,169 @@
+---
+output: 
+  html_document:
+    css: CSS files/graph.css
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+script_folder <- "Scripts/"
+
+scripts <- c(paste0(script_folder,"variables.R")
+             ) 
+
+sapply(scripts, source) #Loads all packages, data files and variables
+
+
+######################################### Positioning confidence intervals in graphs #########################################
+
+# 0 is when the middle of the cofindece inteval sentence aligns with the middle of the confidence interval. 
+# The 'units' are the scale on the x-axis on the graph
+
+#Changes position in the reoffending rate graph
+CI_rate_comp_position <- 18       # Comparison group
+CI_rate_treat_position <- 20      # Treatment group
+
+#Changes position in the reoffending frequency graph
+CI_freq_comp_x_position <- -3     # Comparison group x direction
+CI_freq_comp_y_position <- -.3    # Comparison group y direction
+CI_freq_treat_x_position <- -0.6  # Treatment group x direction
+CI_freq_treat_y_position <- +0.3  # Treatment group y direction
+max_freq_x_val <- 70              # Maximum x value
+freq_x_ticks <- 10                # x-axis ticks
+
+#Changes position in the time to reoffence graph
+CI_time_comp_position <- -55      # Comparison group
+CI_time_treat_position <- -95     # Treatment group
+
+#Other changes can be altered below but these are not essential
+
+##############################################################################################################################
+
+##### Creating graphs and labels 
+
+
+jpeg(file = "Graphs/1y_graph.jpg", width = 1410, height = 420) 
+print(JDLpackage:::reoff_1y_graph(t_test_data[[headline_analysis]],
+                                 text_size = 20,
+                                 ci_text_size = 8,
+                                 y_title_size = 18,
+                                 legend_text_size = 20,
+                                 CI_rate_comp_position, 
+                                 CI_rate_treat_position))
+dev.off()
+
+rate_label_treat <- paste0(treat_reoff_rate_format[headline_analysis],
+                           "<br>reoffenders")
+rate_label_comp <- paste0(comp_reoff_rate_format[headline_analysis],
+                          "<br>reoffenders")
+
+jpeg(file = "Graphs/freq_graph.jpg", width = 1410, height = 420)
+print(JDLpackage:::reoff_freq_graph(t_test_data[[headline_analysis]], 
+                                   max_x_val = max_freq_x_val,
+                                   x_ticks = freq_x_ticks,
+                                   comp_CI_x_position = CI_freq_comp_x_position, 
+                                   treat_CI_x_position = CI_freq_treat_x_position,
+                                   comp_CI_y_position = CI_freq_comp_y_position, 
+                                   treat_CI_y_position = CI_freq_treat_y_position,
+                                   text_size = 20,
+                                   ci_text_size = 8,
+                                   y_title_size = 18, 
+                                   legend_text_size = 20))
+dev.off()
+
+
+freq_label_treat <- paste0(treat_reoff_freq_format[headline_analysis],
+                           "<br>reoffences")
+freq_label_comp <- paste0(comp_reoff_freq_format[headline_analysis],
+                          "<br>reoffences")
+
+jpeg(file = "Graphs/time_graph.jpg", width = 1410, height = 420)
+print(JDLpackage:::time_graph(t_test_data[[headline_analysis]], 
+                             text_size = 20,
+                             ci_text_size = 8,
+                             y_title_size = 18, 
+                             legend_text_size = 20,
+                             CI_time_comp_position, 
+                             CI_time_treat_position))
+dev.off()
+
+time_label_treat <- paste0(treat_time_format[headline_analysis],
+                           "<br>days")
+time_label_comp <- paste0(comp_time_format[headline_analysis],
+                          "<br>days")
+
+
+
+
+```
+
+
+
+<body>
+
+
+
+<!------ One-year rate graph ------>
+<h2>One-year proven reoffending rate after support from `r organisation_name`</h2>
+
+<div class = "graph"><img src="Graphs/1y_graph.jpg">
+
+
+<div class = "label_description">Per 100 people:</div>
+<div class = "graph_label1">`r rate_label_comp`</div>
+<div class = "graph_label2">`r rate_label_treat`</div>
+</div>
+
+<div class="graph_sig_or_not">`r JDLpackage:::sig_or_non_sig(reoff_rate_pvalue[headline_analysis])`</div>
+
+
+
+<!------ One-year freq graph ------>
+<h2>One-year proven reoffending frequency after support from `r organisation_name`</h2>
+
+<div class = "graph"><img src="Graphs/freq_graph.jpg">
+
+<div class = "label_description">Per 100 people:</div>
+<div class = "graph_label3">`r freq_label_comp`</div>
+<div class = "graph_label4">`r freq_label_treat`</div>
+</div>
+
+<div class="graph_sig_or_not">`r JDLpackage:::sig_or_non_sig(reoff_freq_pvalue[headline_analysis])`</div>
+
+
+<div class="footer">
+  This document is released under the Open Government Licence
+</div>
+<!-- <div class="footer1">
+  This document is released under the Open Government Licence
+</div> --> <!-- Previously required for first page footer in Firefox, but now doesn't seem to be necessary -->
+
+
+<!------ Time to reoffence graph ------>
+```{r include=FALSE}
+
+
+if(treat_time_numb[1] >=  30){
+  reoff_tables <- str_c("<h5> </h5> <!--- Page break---->
+
+
+<h2>Average time to first proven reoffence after support from ", organisation_name, "</h2>
+
+<div class = 'graph'><img src='Graphs/time_graph.jpg'>
+
+<div class = 'label_description'>Per 100 people:</div>
+<div class = 'graph_label5'>", time_label_comp, "</div>
+<div class = 'graph_label6'>", time_label_treat, "</div>
+</div>
+
+<div class='graph_sig_or_not'>", JDLpackage:::sig_or_non_sig(time_pvalue[headline_analysis]), "</div>"
+
+  )
+} else {
+  reoff_tables <- ""
+}
+  
+```
+
+`r reoff_tables`

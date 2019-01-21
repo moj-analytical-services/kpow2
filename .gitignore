@@ -1,0 +1,12 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.csv
+packrat/lib*/
+*.jpg
+*.html
+*.xlsx
+*.pdf
+JDL_RAP.Rproj
+.nfs00000000005a6b4400000002
