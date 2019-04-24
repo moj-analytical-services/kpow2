@@ -2,7 +2,3 @@
 .Rhistory
 .RData
 .Ruserdata
-
-
-###to not ignore something 
-# !data.csv (but without hashtag)
